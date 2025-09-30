@@ -2,6 +2,7 @@ import { Product } from '../../domain/entities';
 import { UnexpectedError } from '../../domain/errors';
 import { ProductListUseCase } from '../../domain/usecases';
 import { HttpGetClient, HttpStatusCode } from '../http';
+import { ProductMapper, ProductResponseData } from '../mappers';
 
 export class RemoteProductList implements ProductListUseCase {
   constructor(
@@ -13,11 +14,12 @@ export class RemoteProductList implements ProductListUseCase {
     const response = await this.httpClient.get({
       url: this.url,
     });
-    const products = (response.body as unknown[]) ?? [];
+    const products =
+      (response.body as { products: ProductResponseData[] })?.products ?? [];
 
     switch (response.statusCode) {
       case HttpStatusCode.ok:
-        return products.map((product) => product as Product);
+        return products.map(ProductMapper.mapToDomain);
       case HttpStatusCode.noContent:
         return [];
       default:

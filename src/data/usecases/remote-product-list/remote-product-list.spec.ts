@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { UnexpectedError } from '../../../domain/errors';
 import { HttpStatusCode } from '../../http';
-import { ProductResponseData } from '../../mappers';
+import { ProductsResponseData } from '../../mappers';
 import {
   HttpGetClientSpy,
   mockProductInStock,
@@ -11,13 +11,11 @@ import { RemoteProductList } from './remote-product-list';
 
 type SutTypes = {
   sut: RemoteProductList;
-  httpGetClientSpy: HttpGetClientSpy<{ products: ProductResponseData[] }>;
+  httpGetClientSpy: HttpGetClientSpy<ProductsResponseData>;
 };
 
 const makeSut = (url = faker.internet.url()): SutTypes => {
-  const httpGetClientSpy = new HttpGetClientSpy<{
-    products: ProductResponseData[];
-  }>();
+  const httpGetClientSpy = new HttpGetClientSpy<ProductsResponseData>();
   const sut = new RemoteProductList(url, httpGetClientSpy);
   return {
     sut,
@@ -30,18 +28,25 @@ describe('RemoteLoadSurveyList', () => {
     const { sut, httpGetClientSpy } = makeSut();
     const httpResult = {
       statusCode: HttpStatusCode.ok,
-      body: { products: [mockProductInStock(), mockProductOutOfStock()] },
+      body: {
+        products: [mockProductInStock(), mockProductOutOfStock()],
+        skip: faker.number.int(),
+        total: faker.number.int(),
+      },
     };
 
     httpGetClientSpy.response = httpResult;
 
-    const products = await sut.execute();
+    const { products, skip, total } = await sut.execute();
     const [productInStock, productOutOfStock] = httpResult.body.products;
 
     expect(products).toEqual([
       { ...productInStock, hasInStock: true },
       { ...productOutOfStock, hasInStock: false },
     ]);
+
+    expect(skip).toBe(httpResult.body.skip + httpResult.body.products.length);
+    expect(total).toBe(httpResult.body.total);
   });
 
   it('Should throw an UnexpectedError if the HttpGetClient return an status greater or equal to 400', async () => {

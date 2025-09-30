@@ -10,6 +10,7 @@ export class HttpGetClientSpy<R = unknown> implements HttpGetClient {
   headers?: any;
   response: HttpResponse<R> = {
     statusCode: HttpStatusCode.ok,
+    body: {} as R,
   };
 
   async get(params: HttpGetParams): Promise<HttpResponse<R>> {

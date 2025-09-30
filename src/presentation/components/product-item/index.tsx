@@ -40,7 +40,7 @@ export const ProductItem = ({ product }: Props) => {
   );
 };
 
-export const styles = StyleSheet.create({
+const styles = StyleSheet.create({
   card: {
     padding: 10,
     borderRadius: 10,

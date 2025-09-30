@@ -1,7 +1,13 @@
 import {
+  getCoreRowModel,
+  getFilteredRowModel,
+  useReactTable,
+} from '@tanstack/react-table';
+import { useDeferredValue, useState } from 'react';
+import {
   ActivityIndicator,
   FlatList,
-  Image,
+  Pressable,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -11,6 +17,7 @@ import {
 } from 'react-native';
 import { ProductListUseCase } from '../../../domain/usecases';
 import { CategoryListUseCase } from '../../../domain/usecases/category-list';
+import { ProductItem } from '../../components/product-item';
 import { COLORS } from '../../constants';
 import { useListCategories } from '../../hooks/use-list-categories';
 import { useListProducts } from '../../hooks/use-list-products';
@@ -20,20 +27,10 @@ type Props = {
   categoryListUseCase: CategoryListUseCase;
 };
 
-type Product = {
-  title: string;
-  price: string;
-  rating: number;
-  thumbnail: string;
-};
-
-type ProductItemProps = {
-  product: Product;
-};
-
 type CategoryProps = {
   category: Category;
   isSelected: boolean;
+  onSelect: (category: Category) => void;
 };
 
 type Category = {
@@ -41,43 +38,62 @@ type Category = {
   name: string;
 };
 
-const ProductItem = ({ product }: ProductItemProps) => {
-  const abreviateTitle = (title: string) => {
-    if (title.length > 20) {
-      return title.substring(0, 20) + '...';
-    }
-    return title;
-  };
-
+const CategoryBadge = ({ category, onSelect, isSelected }: CategoryProps) => {
   return (
-    <View style={styles.card}>
-      <Image source={{ uri: product.thumbnail }} style={styles.productImage} />
-      <View>
-        <Text style={styles.title} testID="product-title">
-          {abreviateTitle(product.title)}
-        </Text>
-        <Text style={styles.price} testID="product-price">
-          ${product.price}
-        </Text>
-        <View style={styles.rating}>
-          {Array.from({ length: Math.round(product.rating) }).map((_) => (
-            <Text>⭐</Text>
-          ))}
-        </View>
+    <Pressable onPress={() => onSelect(category)}>
+      <View
+        style={[
+          styles.categoryBadge,
+          { backgroundColor: isSelected ? COLORS.green : COLORS.white },
+        ]}
+      >
+        <Text>{category.name}</Text>
       </View>
-    </View>
+    </Pressable>
   );
 };
 
-const CategoryBadge = ({ category, isSelected }: CategoryProps) => {
+type CategoriesProps = {
+  categories: Category[];
+  categorySelected: string;
+  onSelect: (category: Category) => void;
+};
+
+const Categories = ({
+  categories,
+  categorySelected,
+  onSelect,
+}: CategoriesProps) => {
   return (
-    <View
-      style={[
-        styles.categoryBadge,
-        { backgroundColor: isSelected ? COLORS.green : COLORS.white },
-      ]}
-    >
-      <Text>{category.name}</Text>
+    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+      {categories.map((category) => (
+        <CategoryBadge
+          category={category}
+          isSelected={categorySelected === category.id}
+          key={`category-${category.id}`}
+          onSelect={onSelect}
+        />
+      ))}
+    </ScrollView>
+  );
+};
+
+type SearchBarProps = {
+  value: string;
+  onSearch: (value: string) => void;
+};
+
+const SearchBar = ({ value, onSearch }: SearchBarProps) => {
+  const deferredValue = useDeferredValue(value, '');
+
+  return (
+    <View style={styles.searchBar}>
+      <TextInput
+        style={styles.searchInput}
+        value={deferredValue}
+        placeholder="Search By Name"
+        onChangeText={onSearch}
+      />
     </View>
   );
 };
@@ -86,51 +102,89 @@ export const HomeScreen = ({
   productListUseCase,
   categoryListUseCase,
 }: Props) => {
-  const { products, fetchNextPage, hasNextPage, isLoading } = useListProducts({
+  const [search, setSearch] = useState('');
+  const [categorySelected, setCategorySelected] = useState<string>('');
+  const {
+    products,
+    fetchNextPage,
+    hasNextPage,
+    isLoading: isLoadingProducts,
+  } = useListProducts({
     productListUseCase,
   });
-  const { categories } = useListCategories({ categoryListUseCase });
+  const {
+    categories,
+    isLoading: isLoadingCategories,
+    isError,
+  } = useListCategories({
+    categoryListUseCase,
+  });
 
-  const SearchBar = () => {
-    return (
-      <View style={styles.searchBar}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search by a Product"
-        />
-      </View>
-    );
+  const handleSelectCategory = (category: Category) => {
+    if (categorySelected === category.id) return setCategorySelected('');
+    setCategorySelected(category.id);
   };
+
+  if (isLoadingProducts || isLoadingCategories) return <ActivityIndicator />;
+
+  const table = useReactTable({
+    data: products ?? [],
+    columns: [
+      {
+        accessorKey: 'title',
+        header: 'Title',
+      },
+      {
+        accessorKey: 'category',
+        header: 'Category',
+      },
+    ],
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    state: {
+      globalFilter: search,
+      columnFilters: [
+        {
+          id: 'category',
+          value: categorySelected,
+        },
+      ],
+    },
+    onGlobalFilterChange: setSearch,
+  });
+  const rows = table.getRowModel().rows.map((row) => row.original);
 
   return (
     <View style={styles.container}>
       <SafeAreaView>
         <Text style={styles.screenTitle}>Prodcuts</Text>
-        <SearchBar />
+        <SearchBar value={search} onSearch={setSearch} />
 
         <View style={styles.categoryContainer}>
           <Text style={styles.categoryTitle}>Filter by Category</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {categories.map((category) => (
-              <CategoryBadge category={category} isSelected={false} />
-            ))}
-          </ScrollView>
+
+          <Categories
+            categories={categories ?? []}
+            categorySelected={categorySelected}
+            onSelect={handleSelectCategory}
+          />
         </View>
 
         <View style={{ paddingBottom: 20 }}>
           <FlatList
             testID="product-list"
-            data={products}
+            data={rows}
             onEndReachedThreshold={0.5}
-            renderItem={({ item }) => <ProductItem product={item} />}
+            showsVerticalScrollIndicator={false}
+            renderItem={({ item, index }) => (
+              <ProductItem product={item} key={`product-${index}`} />
+            )}
             ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
             onEndReached={() => {
-              if (hasNextPage) {
-                fetchNextPage();
-              }
+              if (hasNextPage) fetchNextPage();
             }}
             ListFooterComponent={() =>
-              isLoading ? <ActivityIndicator /> : <></>
+              isLoadingProducts ? <ActivityIndicator /> : <></>
             }
           />
         </View>
@@ -204,5 +258,15 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 8,
     marginHorizontal: 8,
     borderColor: COLORS.green,
+  },
+  filterByCategoryContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+  },
+  clearCategoryButton: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: COLORS.green,
   },
 });

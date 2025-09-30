@@ -1,8 +1,8 @@
-import { Product } from '../../domain/entities';
-import { UnexpectedError } from '../../domain/errors';
-import { ProductListUseCase } from '../../domain/usecases';
-import { HttpGetClient, HttpStatusCode } from '../http';
-import { ProductMapper, ProductResponseData } from '../mappers';
+import { Product } from '../../../domain/entities';
+import { UnexpectedError } from '../../../domain/errors';
+import { ProductListUseCase } from '../../../domain/usecases';
+import { HttpGetClient, HttpStatusCode } from '../../http';
+import { ProductMapper, ProductResponseData } from '../../mappers';
 
 export class RemoteProductList implements ProductListUseCase {
   constructor(

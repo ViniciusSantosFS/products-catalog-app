@@ -1,1 +1,1 @@
-export * from './remote-product-list';
+export * from './remote-product-list/remote-product-list';

@@ -1,5 +1,5 @@
 import { HttpGetClient } from '../data/http';
-import { RemoteProductList } from '../data/usecases/remote-product-list';
+import { RemoteProductList } from '../data/usecases';
 import { AxiosHttpClient } from '../infra';
 import { HomeScreen } from '../presentation/screens';
 

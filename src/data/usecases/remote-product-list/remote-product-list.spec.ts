@@ -1,12 +1,12 @@
 import { faker } from '@faker-js/faker';
-import { UnexpectedError } from '../../domain/errors';
-import { HttpStatusCode } from '../http';
-import { ProductResponseData } from '../mappers';
+import { UnexpectedError } from '../../../domain/errors';
+import { HttpStatusCode } from '../../http';
+import { ProductResponseData } from '../../mappers';
 import {
   HttpGetClientSpy,
   mockProductInStock,
   mockProductOutOfStock,
-} from '../test';
+} from '../../test';
 import { RemoteProductList } from './remote-product-list';
 
 type SutTypes = {

@@ -7,4 +7,7 @@ module.exports = {
       extends: ['plugin:testing-library/react'],
     },
   ],
+  rules: {
+    'testing-library/no-wait-for-multiple-assertions': '0',
+  },
 };

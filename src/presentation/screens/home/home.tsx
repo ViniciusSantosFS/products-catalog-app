@@ -1,6 +1,7 @@
 import {
   FlatList,
   Image,
+  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
@@ -17,6 +18,7 @@ type Props = {
 type Product = {
   title: string;
   price: string;
+  rating: number;
   thumbnail: string;
 };
 
@@ -26,16 +28,29 @@ type ProductItemProps = {
 
 export const HomeScreen = ({ productListUseCase }: Props) => {
   const { products } = useListProducts({ productListUseCase });
-  console.log(products);
   const ProductItem = ({ product }: ProductItemProps) => {
+    const abreviateTitle = (title: string) => {
+      if (title.length > 20) {
+        return title.substring(0, 20) + '...';
+      }
+      return title;
+    };
+
     return (
       <View style={styles.card}>
         <Image
           source={{ uri: product.thumbnail }}
           style={styles.productImage}
         />
-        <Text style={styles.title}>{product.title}</Text>
-        <Text style={styles.price}>{product.price}</Text>
+        <View>
+          <Text style={styles.title}>{abreviateTitle(product.title)}</Text>
+          <Text style={styles.price}>${product.price}</Text>
+          <View style={styles.rating}>
+            {Array.from({ length: Math.round(product.rating) }).map((_) => (
+              <Text>⭐</Text>
+            ))}
+          </View>
+        </View>
       </View>
     );
   };
@@ -43,19 +58,26 @@ export const HomeScreen = ({ productListUseCase }: Props) => {
   const SearchBar = () => {
     return (
       <View style={styles.searchBar}>
-        <TextInput style={styles.searchInput} placeholder="Search" />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search by a Product"
+        />
       </View>
     );
   };
 
   return (
     <View style={styles.container}>
-      <SearchBar />
-      <FlatList
-        data={products}
-        renderItem={({ item }) => <ProductItem product={item} />}
-        onEndReached={() => {}}
-      />
+      <SafeAreaView>
+        <Text style={styles.screenTitle}>Prodcuts</Text>
+        <SearchBar />
+        <FlatList
+          data={products}
+          renderItem={({ item }) => <ProductItem product={item} />}
+          ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
+          onEndReached={() => {}}
+        />
+      </SafeAreaView>
     </View>
   );
 };
@@ -63,35 +85,51 @@ export const HomeScreen = ({ productListUseCase }: Props) => {
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 20,
+  },
+  screenTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
   },
   card: {
     padding: 10,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: COLORS.gray,
+    borderColor: COLORS.darkBlue,
+    backgroundColor: COLORS.white,
     elevation: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
   },
   productImage: {
-    height: 100,
-    width: 100,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
+    height: 80,
+    width: 80,
+    marginRight: 16,
   },
   title: {
     fontSize: 16,
+    marginBottom: 4,
     fontWeight: 'bold',
   },
   price: {
     fontSize: 16,
-    color: COLORS.primary,
+    marginBottom: 4,
+    color: COLORS.black,
   },
-
   searchBar: {
-    padding: 10,
+    paddingVertical: 10,
   },
   searchInput: {
     borderWidth: 1,
-    borderColor: COLORS.gray,
-    borderRadius: 10,
+    borderColor: COLORS.green,
+    borderRadius: 5,
+    padding: 10,
+  },
+  rating: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
   },
 });

@@ -3,7 +3,7 @@ import { UnexpectedError } from '../../../domain/errors';
 import { HttpStatusCode } from '../../http';
 import { CategoryResponseData } from '../../mappers/category-mapper';
 import { HttpGetClientSpy } from '../../test';
-import { mockCategoryList } from '../../test/mock-categories';
+import { mockCategoryList } from '../../test/';
 import { RemoteCategoryList } from './remote-category-list';
 
 type SutTypes = {

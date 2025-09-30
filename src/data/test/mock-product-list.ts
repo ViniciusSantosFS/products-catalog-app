@@ -1,8 +1,8 @@
 import { faker } from '@faker-js/faker';
-import { ProductResponseData } from '../mappers';
+import { ApiProductData } from '../mappers';
 
-export const mockProduct = (): ProductResponseData => ({
-  title: faker.commerce.productName(),
+export const mockProduct = (): ApiProductData => ({
+  title: faker.lorem.sentence(),
   price: faker.commerce.price(),
   rating: faker.number.int(),
   brand: faker.commerce.productAdjective(),
@@ -12,17 +12,17 @@ export const mockProduct = (): ProductResponseData => ({
   stock: faker.number.int(),
 });
 
-export const mockProductInStock = (): ProductResponseData => ({
+export const mockProductInStock = (): ApiProductData => ({
   ...mockProduct(),
   stock: faker.number.int(100),
 });
 
-export const mockProductOutOfStock = (): ProductResponseData => ({
+export const mockProductOutOfStock = (): ApiProductData => ({
   ...mockProduct(),
   stock: 0,
 });
 
-export const mockProductList = (): ProductResponseData[] => [
+export const mockProductList = (): ApiProductData[] => [
   mockProduct(),
   mockProduct(),
   mockProduct(),

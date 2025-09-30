@@ -1,18 +1,23 @@
 import {
+  ActivityIndicator,
   FlatList,
   Image,
   SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from 'react-native';
 import { ProductListUseCase } from '../../../domain/usecases';
+import { CategoryListUseCase } from '../../../domain/usecases/category-list';
 import { COLORS } from '../../constants';
+import { useListCategories } from '../../hooks/use-list-categories';
 import { useListProducts } from '../../hooks/use-list-products';
 
 type Props = {
   productListUseCase: ProductListUseCase;
+  categoryListUseCase: CategoryListUseCase;
 };
 
 type Product = {
@@ -26,34 +31,65 @@ type ProductItemProps = {
   product: Product;
 };
 
-export const HomeScreen = ({ productListUseCase }: Props) => {
-  const { products } = useListProducts({ productListUseCase });
-  const ProductItem = ({ product }: ProductItemProps) => {
-    const abreviateTitle = (title: string) => {
-      if (title.length > 20) {
-        return title.substring(0, 20) + '...';
-      }
-      return title;
-    };
+type CategoryProps = {
+  category: Category;
+  isSelected: boolean;
+};
 
-    return (
-      <View style={styles.card}>
-        <Image
-          source={{ uri: product.thumbnail }}
-          style={styles.productImage}
-        />
-        <View>
-          <Text style={styles.title}>{abreviateTitle(product.title)}</Text>
-          <Text style={styles.price}>${product.price}</Text>
-          <View style={styles.rating}>
-            {Array.from({ length: Math.round(product.rating) }).map((_) => (
-              <Text>⭐</Text>
-            ))}
-          </View>
+type Category = {
+  id: string;
+  name: string;
+};
+
+const ProductItem = ({ product }: ProductItemProps) => {
+  const abreviateTitle = (title: string) => {
+    if (title.length > 20) {
+      return title.substring(0, 20) + '...';
+    }
+    return title;
+  };
+
+  return (
+    <View style={styles.card}>
+      <Image source={{ uri: product.thumbnail }} style={styles.productImage} />
+      <View>
+        <Text style={styles.title} testID="product-title">
+          {abreviateTitle(product.title)}
+        </Text>
+        <Text style={styles.price} testID="product-price">
+          ${product.price}
+        </Text>
+        <View style={styles.rating}>
+          {Array.from({ length: Math.round(product.rating) }).map((_) => (
+            <Text>⭐</Text>
+          ))}
         </View>
       </View>
-    );
-  };
+    </View>
+  );
+};
+
+const CategoryBadge = ({ category, isSelected }: CategoryProps) => {
+  return (
+    <View
+      style={[
+        styles.categoryBadge,
+        { backgroundColor: isSelected ? COLORS.green : COLORS.white },
+      ]}
+    >
+      <Text>{category.name}</Text>
+    </View>
+  );
+};
+
+export const HomeScreen = ({
+  productListUseCase,
+  categoryListUseCase,
+}: Props) => {
+  const { products, fetchNextPage, hasNextPage, isLoading } = useListProducts({
+    productListUseCase,
+  });
+  const { categories } = useListCategories({ categoryListUseCase });
 
   const SearchBar = () => {
     return (
@@ -71,12 +107,33 @@ export const HomeScreen = ({ productListUseCase }: Props) => {
       <SafeAreaView>
         <Text style={styles.screenTitle}>Prodcuts</Text>
         <SearchBar />
-        <FlatList
-          data={products}
-          renderItem={({ item }) => <ProductItem product={item} />}
-          ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
-          onEndReached={() => {}}
-        />
+
+        <View style={styles.categoryContainer}>
+          <Text style={styles.categoryTitle}>Filter by Category</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {categories.map((category) => (
+              <CategoryBadge category={category} isSelected={false} />
+            ))}
+          </ScrollView>
+        </View>
+
+        <View style={{ paddingBottom: 20 }}>
+          <FlatList
+            testID="product-list"
+            data={products}
+            onEndReachedThreshold={0.5}
+            renderItem={({ item }) => <ProductItem product={item} />}
+            ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
+            onEndReached={() => {
+              if (hasNextPage) {
+                fetchNextPage();
+              }
+            }}
+            ListFooterComponent={() =>
+              isLoading ? <ActivityIndicator /> : <></>
+            }
+          />
+        </View>
       </SafeAreaView>
     </View>
   );
@@ -131,5 +188,21 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
+  },
+  categoryContainer: {
+    marginVertical: 20,
+  },
+  categoryTitle: {
+    fontWeight: 'bold',
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  categoryBadge: {
+    padding: 5,
+    borderRadius: 5,
+    borderWidth: 1,
+    paddingHorizontal: 8,
+    marginHorizontal: 8,
+    borderColor: COLORS.green,
   },
 });

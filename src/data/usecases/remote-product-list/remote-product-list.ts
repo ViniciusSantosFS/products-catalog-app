@@ -1,8 +1,8 @@
-import { Product } from '../../../domain/entities';
+import { ProductPages } from '../../../domain/entities';
 import { UnexpectedError } from '../../../domain/errors';
 import { ProductListUseCase } from '../../../domain/usecases';
 import { HttpGetClient, HttpStatusCode } from '../../http';
-import { ProductMapper, ProductResponseData } from '../../mappers';
+import { ProductMapper, ProductsResponseData } from '../../mappers';
 
 export class RemoteProductList implements ProductListUseCase {
   constructor(
@@ -10,18 +10,24 @@ export class RemoteProductList implements ProductListUseCase {
     private readonly httpClient: HttpGetClient,
   ) {}
 
-  async execute(): Promise<Product[]> {
+  async execute(skip?: number): Promise<ProductPages> {
     const response = await this.httpClient.get({
-      url: this.url,
+      url: `${this.url}?limit=30&skip=${skip}`,
     });
-    const products =
-      (response.body as { products: ProductResponseData[] })?.products ?? [];
-
+    const data = (response.body as ProductsResponseData) ?? [];
     switch (response.statusCode) {
       case HttpStatusCode.ok:
-        return products.map(ProductMapper.mapToDomain);
+        return {
+          products: data.products.map(ProductMapper.mapToDomain),
+          skip: data.skip + data.products.length,
+          total: data.total,
+        };
       case HttpStatusCode.noContent:
-        return [];
+        return {
+          products: [],
+          skip: 0,
+          total: 0,
+        };
       default:
         throw new UnexpectedError();
     }

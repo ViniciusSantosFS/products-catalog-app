@@ -1,6 +1,12 @@
 import { Product } from '../../domain/entities';
 
-export interface ProductResponseData {
+export type ProductsResponseData = {
+  products: ApiProductData[];
+  skip: number;
+  total: number;
+};
+
+export type ApiProductData = {
   title: string;
   price: string;
   rating: number;
@@ -9,10 +15,10 @@ export interface ProductResponseData {
   thumbnail: string;
   category: string;
   description: string;
-}
+};
 
 export class ProductMapper {
-  static mapToDomain(product: ProductResponseData): Product {
+  static mapToDomain(product: ApiProductData): Product {
     return {
       ...product,
       hasInStock: product.stock > 0,

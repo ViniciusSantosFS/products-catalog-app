@@ -15,8 +15,6 @@ type Props = {
 };
 
 export const ProductDetailsSheet = ({ product, isOpen, onClose }: Props) => {
-  if (product === null) return null;
-
   const bottomSheetRef = useRef<BottomSheet>(null);
 
   const backdrop = useCallback(
@@ -38,6 +36,7 @@ export const ProductDetailsSheet = ({ product, isOpen, onClose }: Props) => {
     }
   }, [isOpen]);
 
+  if (product === null) return null;
   return (
     <BottomSheet
       ref={bottomSheetRef}

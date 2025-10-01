@@ -13,7 +13,7 @@ A React Native product catalog application built with TypeScript that fetches da
 ### 1. Clone the repository
 
 ```bash
-git clone <url>
+git clone git@github.com:ViniciusSantosFS/products-catalog-app.git
 cd productsApp
 ```
 

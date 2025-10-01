@@ -21,9 +21,3 @@ export const mockProductOutOfStock = (): ApiProductData => ({
   ...mockProduct(),
   stock: 0,
 });
-
-export const mockProductList = (): ApiProductData[] => [
-  mockProduct(),
-  mockProduct(),
-  mockProduct(),
-];

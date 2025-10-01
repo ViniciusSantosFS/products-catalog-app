@@ -1,4 +1,4 @@
-import { ScrollView } from 'react-native';
+import { ScrollView, View } from 'react-native';
 
 import { CategoryBadge } from '../';
 
@@ -21,12 +21,13 @@ export const Categories = ({
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
       {categories.map((category) => (
-        <CategoryBadge
-          category={category}
-          isSelected={categorySelected === category.id}
-          key={`category-${category.id}`}
-          onSelect={onSelect}
-        />
+        <View style={{ marginHorizontal: 4 }} key={`category-${category.id}`}>
+          <CategoryBadge
+            category={category}
+            isSelected={categorySelected === category.id}
+            onSelect={onSelect}
+          />
+        </View>
       ))}
     </ScrollView>
   );

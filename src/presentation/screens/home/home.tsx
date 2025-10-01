@@ -1,16 +1,25 @@
+import { useState } from 'react';
 import {
   ActivityIndicator,
   Dimensions,
   FlatList,
+  Pressable,
   SafeAreaView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
+import { Product } from '../../../domain/entities';
 import { ProductListUseCase } from '../../../domain/usecases';
 import { CategoryListUseCase } from '../../../domain/usecases/category-list';
-import { Categories, SearchBar } from '../../components';
-import { ProductItem } from '../../components/product-item';
+import {
+  Categories,
+  CategoryBadge,
+  ProductDetailsSheet,
+  ProductItem,
+  SearchBar,
+} from '../../components';
+import ErrorSheet from '../../components/error-sheet';
 import { useListCategories } from '../../hooks/use-list-categories';
 import { useListProducts } from '../../hooks/use-list-products';
 import { useProductFilters } from '../../hooks/use-product-filters';
@@ -27,10 +36,13 @@ export const HomeScreen = ({
   productListUseCase,
   categoryListUseCase,
 }: Props) => {
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
   const {
     products,
     fetchNextPage,
     hasNextPage,
+    isError: isErrorProducts,
     isLoading: isLoadingProducts,
   } = useListProducts({
     productListUseCase,
@@ -38,58 +50,98 @@ export const HomeScreen = ({
   const {
     categories,
     isLoading: isLoadingCategories,
-    isError,
+    isError: isErrorCategories,
   } = useListCategories({
     categoryListUseCase,
   });
 
-  const { rows, categorySelected, search, setSearch, handleSelectCategory } =
-    useProductFilters({
-      products,
-    });
+  const {
+    rows,
+    categorySelected,
+    search,
+    setSearch,
+    handleSelectCategory,
+    sortingFilters,
+    handleSelectSortingFilter,
+  } = useProductFilters({
+    products,
+  });
 
   if (isLoadingProducts || isLoadingCategories) return <ActivityIndicator />;
+  if (isErrorProducts || isErrorCategories) return <ErrorSheet />;
 
   return (
-    <View style={styles.container}>
-      <SafeAreaView>
-        <Text style={styles.screenTitle}>Prodcuts</Text>
-        <SearchBar value={search} onSearch={setSearch} />
+    <>
+      <View style={styles.container}>
+        <SafeAreaView>
+          <Text style={styles.screenTitle}>Prodcuts</Text>
+          <View style={styles.searchContainer}>
+            <View style={styles.searchBarContainer}>
+              <SearchBar value={search} onSearch={setSearch} />
+            </View>
+            <CategoryBadge
+              category={{ id: 'price', name: '$' }}
+              onSelect={() => handleSelectSortingFilter('price')}
+              isSelected={sortingFilters.price === 'price'}
+            />
+            <View style={{ marginHorizontal: 4 }} />
+            <CategoryBadge
+              category={{ id: 'rating', name: '⭐' }}
+              onSelect={() => handleSelectSortingFilter('rating')}
+              isSelected={sortingFilters.rating === 'rating'}
+            />
+          </View>
 
-        <View style={styles.categoryContainer}>
-          <Text style={styles.categoryTitle}>Filter by Category</Text>
+          <View style={styles.categoryContainer}>
+            <Text style={styles.categoryTitle}>Filter by Category</Text>
 
-          <Categories
-            categories={categories ?? []}
-            categorySelected={categorySelected}
-            onSelect={handleSelectCategory}
-          />
-        </View>
+            <Categories
+              categories={categories ?? []}
+              categorySelected={categorySelected}
+              onSelect={handleSelectCategory}
+            />
+          </View>
 
-        <View style={{ height: LIST_CONTAINER_HEIGHT }}>
-          <FlatList
-            testID="product-list"
-            data={rows}
-            onEndReachedThreshold={0.5}
-            showsVerticalScrollIndicator={false}
-            renderItem={({ item, index }) => (
-              <ProductItem product={item} key={`product-${index}`} />
-            )}
-            ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
-            onEndReached={() => {
-              if (hasNextPage) fetchNextPage();
-            }}
-            ListFooterComponent={() =>
-              isLoadingProducts ? (
-                <ActivityIndicator style={{ marginVertical: 20 }} />
-              ) : (
-                <></>
-              )
-            }
-          />
-        </View>
-      </SafeAreaView>
-    </View>
+          <View style={{ height: LIST_CONTAINER_HEIGHT }}>
+            <FlatList
+              testID="product-list"
+              data={rows}
+              onEndReachedThreshold={0.5}
+              showsVerticalScrollIndicator={false}
+              renderItem={({ item, index }) => (
+                <Pressable
+                  key={`product-${index}`}
+                  onPress={() => {
+                    console.log('item', item);
+                    setSelectedProduct(item);
+                  }}
+                >
+                  <ProductItem product={item} />
+                </Pressable>
+              )}
+              ItemSeparatorComponent={(index) => (
+                <View key={`separator-${index}`} style={{ height: 20 }} />
+              )}
+              onEndReached={() => {
+                if (hasNextPage) fetchNextPage();
+              }}
+              ListFooterComponent={() =>
+                isLoadingProducts ? (
+                  <ActivityIndicator style={{ marginVertical: 20 }} />
+                ) : (
+                  <></>
+                )
+              }
+            />
+          </View>
+        </SafeAreaView>
+      </View>
+      <ProductDetailsSheet
+        product={selectedProduct}
+        isOpen={selectedProduct !== null}
+        onClose={() => setSelectedProduct(null)}
+      />
+    </>
   );
 };
 
@@ -115,5 +167,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
     marginBottom: 10,
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  searchBarContainer: {
+    flexGrow: 1,
+    marginRight: 8,
   },
 });

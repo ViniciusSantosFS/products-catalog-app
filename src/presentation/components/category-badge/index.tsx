@@ -14,7 +14,10 @@ type Category = {
 
 export const CategoryBadge = ({ category, onSelect, isSelected }: Props) => {
   return (
-    <Pressable onPress={() => onSelect(category)}>
+    <Pressable
+      testID={`category-badge-${category.id}`}
+      onPress={() => onSelect(category)}
+    >
       <View
         style={[
           styles.badge,
@@ -33,7 +36,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderWidth: 1,
     paddingHorizontal: 8,
-    marginHorizontal: 8,
     borderColor: COLORS.green,
   },
 });

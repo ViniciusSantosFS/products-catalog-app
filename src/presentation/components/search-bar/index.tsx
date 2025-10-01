@@ -14,7 +14,7 @@ export const SearchBar = ({ value, onSearch }: Props) => {
     <View style={styles.searchBar}>
       <TextInput
         style={styles.searchInput}
-        value={deferredValue}
+        value={value}
         placeholder="Search a product by name"
         onChangeText={onSearch}
       />

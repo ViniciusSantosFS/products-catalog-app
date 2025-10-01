@@ -14,7 +14,9 @@ export class RemoteProductList implements ProductListUseCase {
     const response = await this.httpClient.get({
       url: `${this.url}?limit=30&skip=${skip}`,
     });
-    const data = (response.body as ProductsResponseData) ?? [];
+    const data =
+      (response.body as ProductsResponseData) ?? this.getEmptyProductPages();
+
     switch (response.statusCode) {
       case HttpStatusCode.ok:
         return {
@@ -23,13 +25,17 @@ export class RemoteProductList implements ProductListUseCase {
           total: data.total,
         };
       case HttpStatusCode.noContent:
-        return {
-          products: [],
-          skip: 0,
-          total: 0,
-        };
+        return this.getEmptyProductPages();
       default:
         throw new UnexpectedError();
     }
+  }
+
+  private getEmptyProductPages(): ProductPages {
+    return {
+      products: [],
+      skip: 0,
+      total: 0,
+    };
   }
 }

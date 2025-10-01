@@ -39,10 +39,41 @@ describe('RemoteLoadSurveyList', () => {
     });
   });
 
-  it('Should throw an UnexpectedError if the HttpGetClient return an status greater or equal to 400', async () => {
+  it('Should return an empty list if the HttpGetClient return the status 204', async () => {
+    const { sut, httpGetClientSpy } = makeSut();
+    httpGetClientSpy.response = {
+      statusCode: HttpStatusCode.noContent,
+      body: undefined,
+    };
+
+    const categories = await sut.execute();
+    expect(categories).toEqual([]);
+  });
+
+  it('Should throw an UnexpectedError if the HttpGetClient return the status 500', async () => {
     const { sut, httpGetClientSpy } = makeSut();
     httpGetClientSpy.response = {
       statusCode: HttpStatusCode.serverError,
+    };
+
+    const promise = sut.execute();
+    await expect(promise).rejects.toThrow(new UnexpectedError());
+  });
+
+  it('Should throw an UnexpectedError if the HttpGetClient return the status 400', async () => {
+    const { sut, httpGetClientSpy } = makeSut();
+    httpGetClientSpy.response = {
+      statusCode: HttpStatusCode.badRequest,
+    };
+
+    const promise = sut.execute();
+    await expect(promise).rejects.toThrow(new UnexpectedError());
+  });
+
+  it('Should throw an UnexpectedError if the HttpGetClient return the status 404', async () => {
+    const { sut, httpGetClientSpy } = makeSut();
+    httpGetClientSpy.response = {
+      statusCode: HttpStatusCode.notFound,
     };
 
     const promise = sut.execute();

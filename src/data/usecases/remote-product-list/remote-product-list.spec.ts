@@ -49,7 +49,21 @@ describe('RemoteLoadSurveyList', () => {
     expect(total).toBe(httpResult.body.total);
   });
 
-  it('Should throw an UnexpectedError if the HttpGetClient return an status greater or equal to 400', async () => {
+  it('Should return an empty list if the HttpGetClient return an status 204', async () => {
+    const { sut, httpGetClientSpy } = makeSut();
+    httpGetClientSpy.response = {
+      statusCode: HttpStatusCode.noContent,
+      body: undefined,
+    };
+
+    const { products, skip, total } = await sut.execute();
+
+    expect(products).toEqual([]);
+    expect(skip).toBe(0);
+    expect(total).toBe(0);
+  });
+
+  it('Should throw an UnexpectedError if the HttpGetClient return the status 500', async () => {
     const { sut, httpGetClientSpy } = makeSut();
     httpGetClientSpy.response = {
       statusCode: HttpStatusCode.serverError,
@@ -57,5 +71,38 @@ describe('RemoteLoadSurveyList', () => {
 
     const promise = sut.execute();
     await expect(promise).rejects.toThrow(new UnexpectedError());
+  });
+
+  it('Should throw an UnexpectedError if the HttpGetClient return the status 400', async () => {
+    const { sut, httpGetClientSpy } = makeSut();
+    httpGetClientSpy.response = {
+      statusCode: HttpStatusCode.badRequest,
+    };
+
+    const promise = sut.execute();
+    await expect(promise).rejects.toThrow(new UnexpectedError());
+  });
+
+  it('Should throw an UnexpectedError if the HttpGetClient return the status 404', async () => {
+    const { sut, httpGetClientSpy } = makeSut();
+    httpGetClientSpy.response = {
+      statusCode: HttpStatusCode.notFound,
+    };
+
+    const promise = sut.execute();
+    await expect(promise).rejects.toThrow(new UnexpectedError());
+  });
+
+  it('Should return an empty list if the HttpGetClient return the status 200 with an invalid body', async () => {
+    const { sut, httpGetClientSpy } = makeSut();
+    httpGetClientSpy.response = {
+      statusCode: HttpStatusCode.ok,
+      body: undefined,
+    };
+
+    const { products, skip, total } = await sut.execute();
+    expect(products).toEqual([]);
+    expect(skip).toBe(0);
+    expect(total).toBe(0);
   });
 });

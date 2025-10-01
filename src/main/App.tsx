@@ -6,27 +6,34 @@ import { RemoteCategoryList, RemoteProductList } from '../data/usecases';
 import { AxiosHttpClient } from '../infra';
 import { HomeScreen } from '../presentation/screens';
 import { queryClient } from '../presentation/shared/react-query';
+
+const getApiUrl = (): string => {
+  return process.env.API_URL as string;
+};
+
 const makeAxiosHttpClient = (): HttpGetClient => {
   return new AxiosHttpClient();
 };
 
-export default function App() {
-  const apiUrl = 'https://dummyjson.com/products';
+const makeRemoteProductList = () => {
+  return new RemoteProductList(getApiUrl(), makeAxiosHttpClient());
+};
 
+const makeRemoteCategoryList = () => {
+  return new RemoteCategoryList(
+    `${getApiUrl()}/categories`,
+    makeAxiosHttpClient(),
+  );
+};
+
+export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <GestureHandlerRootView>
         <BottomSheetModalProvider>
           <HomeScreen
-            productListUseCase={
-              new RemoteProductList(apiUrl, makeAxiosHttpClient())
-            }
-            categoryListUseCase={
-              new RemoteCategoryList(
-                `${apiUrl}/categories`,
-                makeAxiosHttpClient(),
-              )
-            }
+            productListUseCase={makeRemoteProductList()}
+            categoryListUseCase={makeRemoteCategoryList()}
           />
         </BottomSheetModalProvider>
       </GestureHandlerRootView>

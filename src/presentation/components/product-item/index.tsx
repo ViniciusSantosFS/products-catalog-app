@@ -31,9 +31,11 @@ export const ProductItem = ({ product }: Props) => {
           ${product.price}
         </Text>
         <View style={styles.rating}>
-          {Array.from({ length: Math.round(product.rating) }).map((_) => (
-            <Text>⭐</Text>
-          ))}
+          {Array.from({ length: Math.round(product.rating) }).map(
+            (_, index) => (
+              <Text key={`rating-${index}`}>⭐</Text>
+            ),
+          )}
         </View>
       </View>
     </View>

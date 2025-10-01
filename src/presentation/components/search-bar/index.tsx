@@ -1,4 +1,3 @@
-import { useDeferredValue } from 'react';
 import { StyleSheet, TextInput, View } from 'react-native';
 import { COLORS } from '../../constants';
 
@@ -8,8 +7,6 @@ type Props = {
 };
 
 export const SearchBar = ({ value, onSearch }: Props) => {
-  const deferredValue = useDeferredValue(value, '');
-
   return (
     <View style={styles.searchBar}>
       <TextInput

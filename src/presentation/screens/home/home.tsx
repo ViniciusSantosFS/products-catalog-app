@@ -5,7 +5,6 @@ import {
   FlatList,
   Pressable,
   SafeAreaView,
-  StyleSheet,
   Text,
   View,
 } from 'react-native';
@@ -23,6 +22,7 @@ import ErrorSheet from '../../components/error-sheet';
 import { useListCategories } from '../../hooks/use-list-categories';
 import { useListProducts } from '../../hooks/use-list-products';
 import { useProductFilters } from '../../hooks/use-product-filters';
+import { styles } from './styles';
 
 type Props = {
   productListUseCase: ProductListUseCase;
@@ -144,36 +144,3 @@ export const HomeScreen = ({
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-  },
-  screenTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  title: {
-    fontSize: 16,
-    marginBottom: 4,
-    fontWeight: 'bold',
-  },
-  categoryContainer: {
-    marginVertical: 20,
-  },
-  categoryTitle: {
-    fontWeight: 'bold',
-    fontSize: 16,
-    marginBottom: 10,
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  searchBarContainer: {
-    flexGrow: 1,
-    marginRight: 8,
-  },
-});

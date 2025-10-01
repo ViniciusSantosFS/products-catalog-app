@@ -137,6 +137,12 @@ export const HomeScreen = ({
         product={selectedProduct}
         isOpen={selectedProduct !== null}
         onClose={() => setSelectedProduct(null)}
+        onAddAReminderWithSuccess={() => {
+          console.log('onAddAReminderWithSuccess');
+        }}
+        onAddAReminderFailure={(error) => {
+          console.log('onAddAReminderFailure', error);
+        }}
       />
     </>
   );

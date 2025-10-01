@@ -4,17 +4,26 @@ import BottomSheet, {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import React, { useCallback, useEffect, useRef } from 'react';
-import { Image, StyleSheet, Text } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
 import { Product } from '../../../domain/entities';
 import { COLORS } from '../../constants';
+import { PurchaseReminderPicker } from '../purchase-reminder-picker';
 
 type Props = {
   product: Product | null;
   isOpen: boolean;
   onClose: () => void;
+  onAddAReminderWithSuccess: () => void;
+  onAddAReminderFailure: (error: string) => void;
 };
 
-export const ProductDetailsSheet = ({ product, isOpen, onClose }: Props) => {
+export const ProductDetailsSheet = ({
+  isOpen,
+  product,
+  onClose,
+  onAddAReminderFailure,
+  onAddAReminderWithSuccess,
+}: Props) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
 
   const backdrop = useCallback(
@@ -56,6 +65,12 @@ export const ProductDetailsSheet = ({ product, isOpen, onClose }: Props) => {
         <Text style={styles.title}>{product.title}</Text>
         <Text style={styles.description}>{product.description}</Text>
         <Text style={styles.brand}>{product.brand}</Text>
+        <View style={{ marginBottom: 40 }} />
+        <PurchaseReminderPicker
+          productName={product.title}
+          onSuccess={onAddAReminderWithSuccess}
+          onError={onAddAReminderFailure}
+        />
       </BottomSheetView>
     </BottomSheet>
   );

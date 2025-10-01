@@ -111,10 +111,7 @@ export const HomeScreen = ({
               renderItem={({ item, index }) => (
                 <Pressable
                   key={`product-${index}`}
-                  onPress={() => {
-                    console.log('item', item);
-                    setSelectedProduct(item);
-                  }}
+                  onPress={() => setSelectedProduct(item)}
                 >
                   <ProductItem product={item} />
                 </Pressable>

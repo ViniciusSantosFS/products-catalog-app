@@ -11,6 +11,6 @@
 
 @interface RCT_EXTERN_MODULE(PurchaseReminder, NSObject)
 
-RCT_EXTERN_METHOD(addPurchaseInCalendar: (NSString*)product purchaseReminderDate: (NSString*)purchaseReminderDate);
+RCT_EXTERN_METHOD(addInCalendar: (NSString*)product purchaseReminderDate: (NSString*)purchaseReminderDate);
 
 @end

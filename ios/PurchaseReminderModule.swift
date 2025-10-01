@@ -9,8 +9,8 @@ class PurchaseReminder: RCTEventEmitter {
     case onSuccess, onError
   }
   
-  @objc(addPurchaseInCalendar: purchaseReminderDate:)
-  func addPurchaseInCalendar(_ product: String, _ purchaseReminderDate: String) {
+  @objc(addInCalendar: purchaseReminderDate:)
+  func addInCalendar(_ product: String, _ purchaseReminderDate: String) {
     self.requestCalendarAccess() { (granted, error) in
       if (error != nil) {
         return self.onError("Ops something went wrong, try again later!")

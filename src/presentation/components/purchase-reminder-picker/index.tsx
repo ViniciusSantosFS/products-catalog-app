@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
+  Alert,
   NativeEventEmitter,
   NativeModules,
   Platform,
@@ -13,20 +14,18 @@ import { COLORS } from '../../constants';
 
 type Props = {
   productName: string;
-  onSuccess: () => void;
-  onError: (error: string) => void;
 };
 const isIOS = Platform.OS === 'ios';
 
 const purchaseReminderModule = NativeModules.PurchaseReminder;
 const purchaseReminderEmitter = new NativeEventEmitter(purchaseReminderModule);
 
-export const PurchaseReminderPicker = ({
-  productName,
-  onSuccess,
-  onError,
-}: Props) => {
+export const PurchaseReminderPicker = ({ productName }: Props) => {
   const [open, setOpen] = useState(false);
+
+  const onSuccess = () =>
+    Alert.alert('Reminder added to calendar with success!🎉');
+  const onError = (error: string) => Alert.alert(error);
 
   useEffect(() => {
     purchaseReminderEmitter.addListener('onSuccess', onSuccess);

@@ -13,17 +13,9 @@ type Props = {
   product: Product | null;
   isOpen: boolean;
   onClose: () => void;
-  onAddAReminderWithSuccess: () => void;
-  onAddAReminderFailure: (error: string) => void;
 };
 
-export const ProductDetailsSheet = ({
-  isOpen,
-  product,
-  onClose,
-  onAddAReminderFailure,
-  onAddAReminderWithSuccess,
-}: Props) => {
+export const ProductDetailsSheet = ({ isOpen, product, onClose }: Props) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
 
   const backdrop = useCallback(
@@ -66,11 +58,7 @@ export const ProductDetailsSheet = ({
         <Text style={styles.description}>{product.description}</Text>
         <Text style={styles.brand}>{product.brand}</Text>
         <View style={{ marginBottom: 40 }} />
-        <PurchaseReminderPicker
-          productName={product.title}
-          onSuccess={onAddAReminderWithSuccess}
-          onError={onAddAReminderFailure}
-        />
+        <PurchaseReminderPicker productName={product.title} />
       </BottomSheetView>
     </BottomSheet>
   );

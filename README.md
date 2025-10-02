@@ -1,3 +1,5 @@
+![Logo](./assets/tiny-logo.png)
+
 # Products App
 
 A React Native product catalog application built with TypeScript that fetches data from the DummyJSON API. Features: product browsing with filtering by category, sorting by price/rating, and detailed product views.

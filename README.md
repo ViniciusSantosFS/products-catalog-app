@@ -27,7 +27,7 @@ yarn
 
 ### 3. iOS Setup
 
-Install Ruby dependencies and CocoaPods:
+Install CocoaPods dependencies:
 
 ```bash
 cd ios/ && pod install && cd ..
@@ -43,7 +43,7 @@ cp .env.sample .env
 
 ## Running the App
 
-### Start Metro Bundler
+### Start Metro
 
 ```bash
 yarn start
@@ -72,7 +72,7 @@ yarn test
 # Run tests in watch mode
 yarn test:watch
 
-### Run lint
+# Run lint
 yarn lint
 ```
 
@@ -80,7 +80,7 @@ yarn lint
 
 This project follows **Clean Architecture** principles with clear separation of concerns:
 
-- **Domain Layer**: Business logic and entities (framework-agnostic)
+- **Domain Layer**: Business logic and entities
 - **Data Layer**: Use case implementations, domain data mappers
 - **Infrastructure Layer**: External frameworks
 - **Presentation Layer**: UI components, screens and hooks

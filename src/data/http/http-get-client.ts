@@ -1,10 +1,10 @@
 import { HttpResponse } from './index';
 
-export type HttpGetParams<H = unknown> = {
+export type HttpGetParams<Headers = unknown> = {
   url: string;
-  headers?: H;
+  headers?: Headers;
 };
 
-export interface HttpGetClient<R = unknown> {
-  get: (params: HttpGetParams) => Promise<HttpResponse<R>>;
+export interface HttpGetClient<ResponseBody = unknown> {
+  get: (params: HttpGetParams) => Promise<HttpResponse<ResponseBody>>;
 }

@@ -2,7 +2,7 @@ import { ProductPages } from '../../../domain/entities';
 import { UnexpectedError } from '../../../domain/errors';
 import { ProductListUseCase } from '../../../domain/usecases';
 import { HttpGetClient, HttpStatusCode } from '../../http';
-import { ProductMapper, ProductsResponseData } from '../../mappers';
+import { ProductListMapper, ProductsListResponseData } from '../../mappers';
 
 export class RemoteProductList implements ProductListUseCase {
   constructor(
@@ -10,32 +10,33 @@ export class RemoteProductList implements ProductListUseCase {
     private readonly httpClient: HttpGetClient,
   ) {}
 
-  async execute(skip?: number): Promise<ProductPages> {
+  async execute(currentPage: number): Promise<ProductPages> {
+    const limit = 30;
+    const skip = currentPage * limit;
+
     const response = await this.httpClient.get({
-      url: `${this.url}?limit=30&skip=${skip}`,
+      url: `${this.url}?limit=${limit}&skip=${skip}`,
     });
-    const data =
-      (response.body as ProductsResponseData) ?? this.getEmptyProductPages();
+    const data = response.body ?? this.getEmptyProductPages(currentPage);
 
     switch (response.statusCode) {
       case HttpStatusCode.ok:
-        return {
-          products: data.products.map(ProductMapper.mapToDomain),
-          skip: data.skip + data.products.length,
-          total: data.total,
-        };
+        return ProductListMapper.mapToDomain(
+          data as ProductsListResponseData,
+          currentPage,
+        );
       case HttpStatusCode.noContent:
-        return this.getEmptyProductPages();
+        return this.getEmptyProductPages(currentPage);
       default:
         throw new UnexpectedError();
     }
   }
 
-  private getEmptyProductPages(): ProductPages {
+  private getEmptyProductPages(page: number): ProductPages {
     return {
       products: [],
-      skip: 0,
-      total: 0,
+      hasNextPage: false,
+      page,
     };
   }
 }

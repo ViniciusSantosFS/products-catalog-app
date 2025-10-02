@@ -11,9 +11,8 @@ export const useListProducts = ({ productListUseCase }: Params) => {
     useInfiniteQuery({
       queryKey: [QueryClientKeys.PRODUCTS],
       getNextPageParam: (lastPage: ProductPages) => {
-        const hasReachedEnd = lastPage.skip >= lastPage.total;
-        if (hasReachedEnd) return undefined;
-        return lastPage.skip;
+        if (!lastPage.hasNextPage) return undefined;
+        return lastPage.page;
       },
       queryFn: ({ pageParam }) => productListUseCase.execute(pageParam),
       initialPageParam: 0,

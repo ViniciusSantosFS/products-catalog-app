@@ -14,7 +14,7 @@ export const mockProduct = (): ApiProductData => ({
 
 export const mockProductInStock = (): ApiProductData => ({
   ...mockProduct(),
-  stock: faker.number.int(100),
+  stock: faker.number.int({ min: 1, max: 100 }),
 });
 
 export const mockProductOutOfStock = (): ApiProductData => ({

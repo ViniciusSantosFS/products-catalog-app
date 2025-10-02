@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { UnexpectedError } from '../../../domain/errors';
 import { HttpStatusCode } from '../../http';
-import { ProductsResponseData } from '../../mappers';
+import { ProductsListResponseData } from '../../mappers';
 import {
   HttpGetClientSpy,
   mockProductInStock,
@@ -11,11 +11,11 @@ import { RemoteProductList } from './remote-product-list';
 
 type SutTypes = {
   sut: RemoteProductList;
-  httpGetClientSpy: HttpGetClientSpy<ProductsResponseData>;
+  httpGetClientSpy: HttpGetClientSpy<ProductsListResponseData>;
 };
 
 const makeSut = (url = faker.internet.url()): SutTypes => {
-  const httpGetClientSpy = new HttpGetClientSpy<ProductsResponseData>();
+  const httpGetClientSpy = new HttpGetClientSpy<ProductsListResponseData>();
   const sut = new RemoteProductList(url, httpGetClientSpy);
   return {
     sut,
@@ -36,8 +36,9 @@ describe('RemoteLoadSurveyList', () => {
     };
 
     httpGetClientSpy.response = httpResult;
+    const currentPage = faker.number.int();
 
-    const { products, skip, total } = await sut.execute();
+    const { products, hasNextPage, page } = await sut.execute(currentPage);
     const [productInStock, productOutOfStock] = httpResult.body.products;
 
     expect(products).toEqual([
@@ -45,8 +46,9 @@ describe('RemoteLoadSurveyList', () => {
       { ...productOutOfStock, hasInStock: false },
     ]);
 
-    expect(skip).toBe(httpResult.body.skip + httpResult.body.products.length);
-    expect(total).toBe(httpResult.body.total);
+    const nextPage = currentPage + 1;
+    expect(hasNextPage).toBe(true);
+    expect(page).toBe(nextPage);
   });
 
   it('Should return an empty list if the HttpGetClient return an status 204', async () => {
@@ -56,11 +58,12 @@ describe('RemoteLoadSurveyList', () => {
       body: undefined,
     };
 
-    const { products, skip, total } = await sut.execute();
+    const currentPage = faker.number.int();
+    const { products, hasNextPage, page } = await sut.execute(currentPage);
 
     expect(products).toEqual([]);
-    expect(skip).toBe(0);
-    expect(total).toBe(0);
+    expect(hasNextPage).toBe(false);
+    expect(page).toBe(currentPage);
   });
 
   it('Should throw an UnexpectedError if the HttpGetClient return the status 500', async () => {
@@ -69,7 +72,7 @@ describe('RemoteLoadSurveyList', () => {
       statusCode: HttpStatusCode.serverError,
     };
 
-    const promise = sut.execute();
+    const promise = sut.execute(faker.number.int());
     await expect(promise).rejects.toThrow(new UnexpectedError());
   });
 
@@ -79,7 +82,7 @@ describe('RemoteLoadSurveyList', () => {
       statusCode: HttpStatusCode.badRequest,
     };
 
-    const promise = sut.execute();
+    const promise = sut.execute(faker.number.int());
     await expect(promise).rejects.toThrow(new UnexpectedError());
   });
 
@@ -89,7 +92,7 @@ describe('RemoteLoadSurveyList', () => {
       statusCode: HttpStatusCode.notFound,
     };
 
-    const promise = sut.execute();
+    const promise = sut.execute(faker.number.int());
     await expect(promise).rejects.toThrow(new UnexpectedError());
   });
 
@@ -99,10 +102,11 @@ describe('RemoteLoadSurveyList', () => {
       statusCode: HttpStatusCode.ok,
       body: undefined,
     };
+    const currentPage = faker.number.int();
+    const { products, hasNextPage, page } = await sut.execute(currentPage);
 
-    const { products, skip, total } = await sut.execute();
     expect(products).toEqual([]);
-    expect(skip).toBe(0);
-    expect(total).toBe(0);
+    expect(hasNextPage).toBe(false);
+    expect(page).toBe(currentPage);
   });
 });

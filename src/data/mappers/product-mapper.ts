@@ -1,6 +1,6 @@
-import { Product } from '../../domain/entities';
+import { Product, ProductPages } from '../../domain/entities';
 
-export type ProductsResponseData = {
+export type ProductsListResponseData = {
   products: ApiProductData[];
   skip: number;
   total: number;
@@ -17,11 +17,23 @@ export type ApiProductData = {
   description: string;
 };
 
-export class ProductMapper {
-  static mapToDomain(product: ApiProductData): Product {
+export class ProductListMapper {
+  static mapProductToDomain(product: ApiProductData): Product {
     return {
       ...product,
       hasInStock: product.stock > 0,
+    };
+  }
+
+  static mapToDomain(
+    productsList: ProductsListResponseData,
+    currentPage: number,
+  ): ProductPages {
+    const hasNextPage = productsList.products.length < productsList.total;
+    return {
+      products: productsList.products.map(ProductListMapper.mapProductToDomain),
+      page: hasNextPage ? currentPage + 1 : currentPage,
+      hasNextPage,
     };
   }
 }

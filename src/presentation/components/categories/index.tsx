@@ -1,11 +1,7 @@
 import { ScrollView, View } from 'react-native';
 
 import { CategoryBadge } from '../';
-
-type Category = {
-  id: string;
-  name: string;
-};
+import { Category } from '../../../domain/entities';
 
 type CategoriesProps = {
   categories: Category[];

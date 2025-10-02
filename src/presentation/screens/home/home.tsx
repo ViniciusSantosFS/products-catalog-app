@@ -9,8 +9,10 @@ import {
   View,
 } from 'react-native';
 import { Product } from '../../../domain/entities';
-import { ProductListUseCase } from '../../../domain/usecases';
-import { CategoryListUseCase } from '../../../domain/usecases/category-list';
+import {
+  CategoryListUseCase,
+  ProductListUseCase,
+} from '../../../domain/usecases';
 import {
   Categories,
   CategoryBadge,

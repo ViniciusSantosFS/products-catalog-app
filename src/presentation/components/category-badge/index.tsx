@@ -1,15 +1,11 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Category } from '../../../domain/entities';
 import { COLORS } from '../../constants';
 
 type Props = {
   category: Category;
   isSelected: boolean;
   onSelect: (category: Category) => void;
-};
-
-type Category = {
-  id: string;
-  name: string;
 };
 
 export const CategoryBadge = ({ category, onSelect, isSelected }: Props) => {

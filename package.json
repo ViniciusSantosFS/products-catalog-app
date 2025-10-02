@@ -8,7 +8,8 @@
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest --no-cache",
-    "test:watch": "npm test -- --watch"
+    "test:watch": "npm test -- --watch",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@gorhom/bottom-sheet": "^5",
@@ -16,6 +17,8 @@
     "@tanstack/react-query": "^5.90.2",
     "@tanstack/react-table": "^8.21.3",
     "axios": "^1.12.2",
+    "patch-package": "^8.0.1",
+    "postinstall-postinstall": "^2.1.0",
     "react": "19.1.0",
     "react-native": "0.80.0",
     "react-native-date-picker": "^5.0.13",

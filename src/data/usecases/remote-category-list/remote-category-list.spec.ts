@@ -31,12 +31,12 @@ describe('RemoteLoadSurveyList', () => {
     httpGetClientSpy.response = httpResult;
 
     const categories = await sut.execute();
-    const [expected] = httpResult.body;
+    const expected = httpResult.body.map((item) => ({
+      id: item.slug,
+      name: item.name,
+    }));
 
-    expect(categories[0]).toEqual({
-      id: expected.slug,
-      name: expected.name,
-    });
+    expect(categories).toEqual(expected);
   });
 
   it('Should return an empty list if the HttpGetClient return the status 204', async () => {

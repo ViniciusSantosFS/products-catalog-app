@@ -6,8 +6,6 @@ type Params = {
   categoryListUseCase: CategoryListUseCase;
 };
 
-const FIVE_HOURS_IN_MS = 1000 * 60 * 60 * 5;
-
 export const useListCategories = ({ categoryListUseCase }: Params) => {
   const {
     data: categories,
@@ -16,7 +14,7 @@ export const useListCategories = ({ categoryListUseCase }: Params) => {
   } = useQuery({
     queryKey: [QueryClientKeys.CATEGORIES],
     queryFn: () => categoryListUseCase.execute(),
-    staleTime: FIVE_HOURS_IN_MS,
+    staleTime: Infinity,
   });
 
   return { categories, isLoading, isError };

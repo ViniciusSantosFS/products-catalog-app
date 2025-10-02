@@ -50,15 +50,13 @@
 		13B07FAE1A68108700A75B9A /* productsApp */ = {
 			isa = PBXGroup;
 			children = (
+				EAEA40912E8D75B600137196 /* productsApp-Bridging-Header.h */,
+				EA118B782E8EAE9100D1D94F /* NativeModules */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				761780EC2CA45674006654EE /* AppDelegate.swift */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */,
-				EAEA408E2E8D757100137196 /* PurchaseReminderModule.h */,
-				EAEA408F2E8D759600137196 /* PurchaseReminderModule.swift */,
-				EAEA40922E8D75B600137196 /* PurchaseReminderModule.m */,
-				EAEA40912E8D75B600137196 /* productsApp-Bridging-Header.h */,
 				EAC0182E2E8DEBDF00005460 /* DateFormatter.swift */,
 			);
 			name = productsApp;
@@ -109,6 +107,24 @@
 				B1B2C347D2A093A274CD7407 /* Pods-productsApp.release.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		EA118B782E8EAE9100D1D94F /* NativeModules */ = {
+			isa = PBXGroup;
+			children = (
+				EA118B792E8EAE9E00D1D94F /* purchaseReminder */,
+			);
+			path = NativeModules;
+			sourceTree = "<group>";
+		};
+		EA118B792E8EAE9E00D1D94F /* purchaseReminder */ = {
+			isa = PBXGroup;
+			children = (
+				EAEA408E2E8D757100137196 /* PurchaseReminderModule.h */,
+				EAEA408F2E8D759600137196 /* PurchaseReminderModule.swift */,
+				EAEA40922E8D75B600137196 /* PurchaseReminderModule.m */,
+			);
+			path = purchaseReminder;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -204,9 +220,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-productsApp/Pods-productsApp-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-productsApp/Pods-productsApp-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -221,9 +241,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-productsApp/Pods-productsApp-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-productsApp/Pods-productsApp-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -394,10 +418,7 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
@@ -466,10 +487,7 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;

@@ -29,9 +29,9 @@ describe('RemoteLoadSurveyList', () => {
     const httpResult = {
       statusCode: HttpStatusCode.ok,
       body: {
-        products: [mockProductInStock(), mockProductOutOfStock()],
+        products: [mockProductInStock(1), mockProductOutOfStock(2)],
         skip: faker.number.int(),
-        total: faker.number.int(),
+        total: faker.number.int({ min: 3 }),
       },
     };
 

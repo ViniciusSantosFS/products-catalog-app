@@ -17,7 +17,7 @@ export class RemoteProductList implements ProductListUseCase {
     const response = await this.httpClient.get({
       url: `${this.url}?limit=${limit}&skip=${skip}`,
     });
-    const data = response.body ?? this.getEmptyProductPages(currentPage);
+    const data = response?.body ?? this.getEmptyProductPages(currentPage);
 
     switch (response.statusCode) {
       case HttpStatusCode.ok:

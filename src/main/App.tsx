@@ -1,4 +1,3 @@
-import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { HttpGetClient } from '../data/http';
@@ -30,12 +29,10 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <GestureHandlerRootView>
-        <BottomSheetModalProvider>
-          <HomeScreen
-            productListUseCase={makeRemoteProductList()}
-            categoryListUseCase={makeRemoteCategoryList()}
-          />
-        </BottomSheetModalProvider>
+        <HomeScreen
+          productListUseCase={makeRemoteProductList()}
+          categoryListUseCase={makeRemoteCategoryList()}
+        />
       </GestureHandlerRootView>
     </QueryClientProvider>
   );

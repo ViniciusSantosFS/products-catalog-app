@@ -4,11 +4,11 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Category, Product } from '../../domain/entities';
 
 type Params = {
-  products?: Product[];
+  products: Product[];
 };
 
 type SortingFilters = 'price' | 'rating';
@@ -22,23 +22,8 @@ export const useProductFilters = ({ products }: Params) => {
     rating: '',
   });
 
-  const handleSelectCategory = (category: Category) => {
-    if (categorySelected === category.id) return setCategorySelected('');
-    setCategorySelected(category.id);
-  };
-
-  const handleSelectSortingFilter = (key: SortingFilters) => {
-    if (sortingFilters.price === key)
-      return setSortingFilters({ ...sortingFilters, price: '' });
-    if (sortingFilters.rating === key)
-      return setSortingFilters({ ...sortingFilters, rating: '' });
-
-    setSortingFilters({ ...sortingFilters, [key]: key });
-  };
-
-  const table = useReactTable({
-    data: products ?? [],
-    columns: [
+  const columns = useMemo(
+    () => [
       {
         accessorKey: 'title',
         header: 'Title',
@@ -62,27 +47,57 @@ export const useProductFilters = ({ products }: Params) => {
         enableSorting: sortingFilters.rating === 'rating',
       },
     ],
+    [sortingFilters.price, sortingFilters.rating],
+  );
+
+  const columnFilters = useMemo(
+    () => [
+      {
+        id: 'category',
+        value: categorySelected,
+      },
+    ],
+    [categorySelected],
+  );
+
+  const sorting = useMemo(
+    () => [
+      {
+        id: 'price',
+        desc: false,
+      },
+      {
+        id: 'rating',
+        desc: true,
+      },
+    ],
+    [sortingFilters.price, sortingFilters.rating],
+  );
+
+  const handleSelectCategory = (category: Category) => {
+    if (categorySelected === category.id) return setCategorySelected('');
+    setCategorySelected(category.id);
+  };
+
+  const handleSelectSortingFilter = (key: SortingFilters) => {
+    if (sortingFilters.price === key)
+      return setSortingFilters({ ...sortingFilters, price: '' });
+    if (sortingFilters.rating === key)
+      return setSortingFilters({ ...sortingFilters, rating: '' });
+
+    setSortingFilters({ ...sortingFilters, [key]: key });
+  };
+
+  const table = useReactTable({
+    data: products,
+    columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
     state: {
       globalFilter: search,
-      columnFilters: [
-        {
-          id: 'category',
-          value: categorySelected,
-        },
-      ],
-      sorting: [
-        {
-          id: 'price',
-          desc: false,
-        },
-        {
-          id: 'rating',
-          desc: true,
-        },
-      ],
+      columnFilters,
+      sorting,
     },
     onGlobalFilterChange: setSearch,
   });

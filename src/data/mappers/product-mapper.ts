@@ -7,6 +7,7 @@ export type ProductsListResponseData = {
 };
 
 export type ApiProductData = {
+  id: number;
   title: string;
   price: string;
   rating: number;
@@ -29,7 +30,13 @@ export class ProductListMapper {
     productsList: ProductsListResponseData,
     currentPage: number,
   ): ProductPages {
-    const hasNextPage = productsList.products.length < productsList.total;
+    const lastProductReceived =
+      productsList.products[productsList.products.length - 1];
+    const hasNextPage = lastProductReceived
+      ? productsList.products[productsList.products.length - 1].id <
+        productsList.total
+      : false;
+
     return {
       products: productsList.products.map(ProductListMapper.mapProductToDomain),
       page: hasNextPage ? currentPage + 1 : currentPage,

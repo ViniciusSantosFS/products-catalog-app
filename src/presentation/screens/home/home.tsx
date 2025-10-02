@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Dimensions,
@@ -39,7 +39,7 @@ export const HomeScreen = ({
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const {
-    products,
+    data,
     fetchNextPage,
     hasNextPage,
     isError: isErrorProducts,
@@ -47,6 +47,12 @@ export const HomeScreen = ({
   } = useListProducts({
     productListUseCase,
   });
+
+  const products = useMemo(
+    () => data?.pages.flatMap(({ products }) => products) ?? [],
+    [data],
+  );
+
   const {
     categories,
     isLoading: isLoadingCategories,
@@ -106,8 +112,8 @@ export const HomeScreen = ({
             <FlatList
               testID="product-list"
               data={rows}
-              onEndReachedThreshold={0.5}
               showsVerticalScrollIndicator={false}
+              onEndReachedThreshold={0.5}
               renderItem={({ item, index }) => (
                 <Pressable
                   key={`product-${index}`}

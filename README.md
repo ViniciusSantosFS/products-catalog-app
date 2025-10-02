@@ -6,7 +6,7 @@ A React Native product catalog application built with TypeScript that fetches da
 
 - Node.js (v18 or higher)
 - yarn
-- React Native development environment setup
+- React Native development environment [setup](https://reactnative.dev/docs/0.80/set-up-your-environment)
 
 ## Setup Instructions
 
@@ -34,6 +34,10 @@ cd ios/ && pod install && cd ..
 ### 4. Environment Configuration
 
 Create a `.env` file in the project root.
+
+```bash
+cp .env.sample .env
+```
 
 ## Running the App
 

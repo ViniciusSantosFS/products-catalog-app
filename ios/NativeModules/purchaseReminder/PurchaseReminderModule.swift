@@ -4,6 +4,7 @@ import EventKit
 @objc(PurchaseReminder)
 class PurchaseReminder: RCTEventEmitter {
   let eventStore = EKEventStore()
+  let defaultErrorMessage = "Ops something went wrong, try again later!"
   
   enum BridgeEvents: String {
     case onSuccess, onError
@@ -13,7 +14,7 @@ class PurchaseReminder: RCTEventEmitter {
   func addInCalendar(_ product: String, _ purchaseReminderDate: String) {
     self.requestCalendarAccess() { (granted, error) in
       if (error != nil) {
-        return self.onError("Ops something went wrong, try again later!")
+        return self.onError(self.defaultErrorMessage)
       };
       
       if(granted == false) {
@@ -22,7 +23,7 @@ class PurchaseReminder: RCTEventEmitter {
       
       let event = EKEvent(eventStore: self.eventStore)
       guard let eventDate = DateFormatter().getDateFromString(purchaseReminderDate) else {
-        return self.onError("Ops something went wrong, try again later!")
+        return self.onError(self.defaultErrorMessage)
       }
       
       event.title = "Purchase \(product) Reminder"
@@ -34,8 +35,8 @@ class PurchaseReminder: RCTEventEmitter {
       do {
         try self.eventStore.save(event, span: .thisEvent)
         self.onSuccess()
-      } catch let error as NSError {
-        self.onError(error.description)
+      } catch {
+        self.onError(self.defaultErrorMessage)
       }
     }
   }
